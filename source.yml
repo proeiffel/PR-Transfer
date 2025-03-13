@@ -1,17 +1,32 @@
-TANIM: Günlük Log Yedekleme
-AÇIKLAMA: /var/logs içindeki belirli uzantılara sahip dosyaları yedekle
+# TANIM: Bu konfigürasyon dosyası belirli bir kaynaktan dosyaları seçip hedefe kopyalar veya taşır.
+# AÇIKLAMA: Burada tüm kullanılabilir seçenekleri ve ne yaptıklarını açıklıyoruz.
 
-SOURCE: /var/logs
-TARGET: /backup/logs
+# Kaynak ve hedef dizinleri tanımla
+SOURCE: "/var/logs"  # İşlenecek dosyaların bulunduğu kaynak klasör
+TARGET: "/backup/logs"  # Kopyalanacak veya taşınacak hedef klasör
 
-EXTENSIONS: [".log", ".txt"]
-MIN_SIZE: 1024
-MAX_SIZE: 1048576
-USE_SIZE_FILTER: True
+# Uzantı filtresi (Boş bırakılırsa tüm dosyalar seçilir)
+EXTENSIONS: [".log", ".txt"]  # Sadece belirtilen uzantılara sahip dosyalar işlenir
 
-START_DATE: "2024-03-01"
-END_DATE: "2024-03-10"
-USE_DATE_FILTER: True
+# Dosya boyutu filtreleme (bayt cinsinden)
+MIN_SIZE: 1024  # Minimum dosya boyutu (1KB)
+MAX_SIZE: 1048576  # Maksimum dosya boyutu (1MB)
+USE_SIZE_FILTER: True  # True: Boyut filtresini uygula, False: Tüm dosyaları al
 
-MOVE: False
-ZIP: True
+# Tarih filtreleme (YYYY-MM-DD formatında)
+START_DATE: "2024-03-01"  # Bu tarihten sonra oluşturulan dosyaları al
+END_DATE: "2024-03-10"  # Bu tarihten önce oluşturulan dosyaları al
+USE_DATE_FILTER: True  # True: Tarih filtresini uygula, False: Tüm dosyaları al
+
+# Sabit tarih aralıkları (START_DATE ve END_DATE yerine kullanılabilir)
+# Mevcut seçenekler: last_15_days, last_1_month, last_3_months, last_6_months, last_1_year
+DATE_FILTER: last_3_months  # Son 3 ay içinde değiştirilmiş dosyaları işle
+
+# İşlem tipi: Dosyalar taşınacak mı yoksa kopyalanacak mı?
+MOVE: False  # True: Taşı (Kaynak klasörden sil), False: Kopyala
+
+# ZIP seçeneği
+ZIP: True  # True: Hedef klasörde ZIP oluştur, False: ZIP oluşturma
+
+# Günlük dosyası işlemleri (Her source için otomatik oluşturulur)
+LOG_FILE: "source_logs.log"  # Bu parametre zorunlu değil, otomatik olarak ayarlanır
