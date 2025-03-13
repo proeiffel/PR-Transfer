@@ -39,6 +39,15 @@ def get_relative_date_range(date_filter):
         return today - timedelta(days=365), today
     return None, None
 
+def validate_target(source, target):
+    """TARGET'in SOURCE içinde olup olmadığını kontrol eder ve uyarı verir"""
+    abs_source = os.path.abspath(source)
+    abs_target = os.path.abspath(target)
+    if abs_target.startswith(abs_source):
+        print(f"WARNING: TARGET '{target}' kaynağın '{source}' içinde bulunuyor! İşlemlerden çıkarılacak.")
+        return False
+    return True
+
 def filter_files(source, extensions=None, min_size=None, max_size=None, use_size_filter=True, start_date=None, end_date=None, use_date_filter=True):
     """Belirtilen kriterlere göre dosyaları filtrele"""
     files_to_process = []
@@ -122,6 +131,9 @@ if __name__ == "__main__":
             
             if not source or not target:
                 print(f"ERROR: {config_file} dosyasında SOURCE veya TARGET eksik!")
+                continue
+            
+            if not validate_target(source, target):
                 continue
             
             # Opsiyonel filtreleme parametreleri
