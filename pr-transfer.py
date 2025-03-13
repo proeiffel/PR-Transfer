@@ -7,6 +7,13 @@ from datetime import datetime, timedelta
 
 def setup_logging(log_file):
     """Her source için ayrı log dosyası oluştur"""
+    logging.shutdown()  # Önceki log yapılandırmasını sıfırla
+    logging.getLogger().handlers.clear()
+    
+    log_dir = os.path.dirname(log_file)
+    if log_dir and not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,
@@ -127,7 +134,7 @@ if __name__ == "__main__":
             source = config.get("SOURCE")
             target = config.get("TARGET")
             config_file = config.get("CONFIG_FILE", "source_unknown.yml")
-            log_file = f"{config_file}.log"
+            log_file = os.path.join(os.path.dirname(config_file), f"{config_file}.log")
             
             if not source or not target:
                 print(f"ERROR: {config_file} dosyasında SOURCE veya TARGET eksik!")
@@ -148,7 +155,6 @@ if __name__ == "__main__":
             start_date = datetime.strptime(config.get("START_DATE", ""), "%Y-%m-%d") if config.get("START_DATE") else None
             end_date = datetime.strptime(config.get("END_DATE", ""), "%Y-%m-%d") if config.get("END_DATE") else None
             
-            # Sabit tarih aralıkları
             if "DATE_FILTER" in config:
                 start_date, end_date = get_relative_date_range(config["DATE_FILTER"])
             
