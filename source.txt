@@ -1,0 +1,22 @@
+# Kaynak ve hedef dizinleri belirt
+SOURCE=/path/to/source
+TARGET=/path/to/target
+
+# Belirli uzantıları filtrele (Virgülle ayır)
+EXTENSIONS=.txt,.log,.csv
+
+# Dosya boyutu filtreleme (bayt cinsinden)
+MIN_SIZE=1024         # Min dosya boyutu (1KB)
+MAX_SIZE=1048576      # Max dosya boyutu (1MB)
+USE_SIZE_FILTER=True  # Boyut filtresini aç/kapat
+
+# Tarih filtreleme (YYYY-MM-DD formatında)
+START_DATE=2024-03-01 # Bu tarihten sonra oluşturulan dosyalar
+END_DATE=2024-03-10   # Bu tarihten önce oluşturulan dosyalar
+USE_DATE_FILTER=True  # Tarih filtresini aç/kapat
+
+# Dosyaları taşı (MOVE=True) veya kopyala (MOVE=False)
+MOVE=False
+
+# Dosyaları ZIP olarak arşivle
+ZIP=True
