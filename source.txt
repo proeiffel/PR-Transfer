@@ -1,3 +1,7 @@
+# Tanım ve Açıklama
+TANIM=Günlük Log Yedekleme
+AÇIKLAMA=/var/logs içindeki belirli uzantılara sahip dosyaları yedekle
+
 # Kaynak ve hedef dizinleri belirt
 SOURCE=/path/to/source
 TARGET=/path/to/target
