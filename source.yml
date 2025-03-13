@@ -1,0 +1,17 @@
+TANIM: Günlük Log Yedekleme
+AÇIKLAMA: /var/logs içindeki belirli uzantılara sahip dosyaları yedekle
+
+SOURCE: /var/logs
+TARGET: /backup/logs
+
+EXTENSIONS: [".log", ".txt"]
+MIN_SIZE: 1024
+MAX_SIZE: 1048576
+USE_SIZE_FILTER: True
+
+START_DATE: "2024-03-01"
+END_DATE: "2024-03-10"
+USE_DATE_FILTER: True
+
+MOVE: False
+ZIP: True
