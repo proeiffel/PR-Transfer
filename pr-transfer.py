@@ -2,7 +2,8 @@ import os
 import shutil
 import logging
 import zipfile
-from datetime import datetime
+import yaml
+from datetime import datetime, timedelta
 
 def setup_logging(log_file):
     """Her source için ayrı log dosyası oluştur"""
@@ -13,17 +14,30 @@ def setup_logging(log_file):
     )
 
 def read_config_files():
-    """Mevcut dizindeki tüm source*.txt dosyalarını oku"""
+    """Mevcut dizindeki tüm source*.yml dosyalarını oku"""
     configs = []
     for file in os.listdir():
-        if file.startswith("source") and file.endswith(".txt"):
-            config = {"CONFIG_FILE": file}  # Dosya adını sakla
+        if file.startswith("source") and file.endswith(".yml"):
             with open(file, 'r', encoding='utf-8') as f:
-                for line in f:
-                    key, value = line.strip().split('=')
-                    config[key.strip()] = value.strip()
-            configs.append(config)
+                config = yaml.safe_load(f)
+                config["CONFIG_FILE"] = file  # Dosya adını sakla
+                configs.append(config)
     return configs
+
+def get_relative_date_range(date_filter):
+    """Belirtilen sabit tarih aralıklarını hesaplar"""
+    today = datetime.now()
+    if date_filter == "last_15_days":
+        return today - timedelta(days=15), today
+    elif date_filter == "last_1_month":
+        return today - timedelta(days=30), today
+    elif date_filter == "last_3_months":
+        return today - timedelta(days=90), today
+    elif date_filter == "last_6_months":
+        return today - timedelta(days=180), today
+    elif date_filter == "last_1_year":
+        return today - timedelta(days=365), today
+    return None, None
 
 def filter_files(source, extensions=None, min_size=None, max_size=None, use_size_filter=True, start_date=None, end_date=None, use_date_filter=True):
     """Belirtilen kriterlere göre dosyaları filtrele"""
@@ -98,12 +112,12 @@ if __name__ == "__main__":
     configs = read_config_files()
     
     if not configs:
-        print("ERROR: Hiçbir source.txt dosyası bulunamadı!")
+        print("ERROR: Hiçbir source.yml dosyası bulunamadı!")
     else:
         for config in configs:
             source = config.get("SOURCE")
             target = config.get("TARGET")
-            config_file = config.get("CONFIG_FILE", "source_unknown.txt")
+            config_file = config.get("CONFIG_FILE", "source_unknown.yml")
             log_file = f"{config_file}.log"
             
             if not source or not target:
@@ -111,16 +125,20 @@ if __name__ == "__main__":
                 continue
             
             # Opsiyonel filtreleme parametreleri
-            extensions = config.get("EXTENSIONS", "").split(',') if "EXTENSIONS" in config else None
-            min_size = int(config.get("MIN_SIZE", 0)) if "MIN_SIZE" in config else None
-            max_size = int(config.get("MAX_SIZE", 0)) if "MAX_SIZE" in config else None
-            move = config.get("MOVE", "False").lower() == "true"
-            zip_files = config.get("ZIP", "False").lower() == "true"
-            use_size_filter = config.get("USE_SIZE_FILTER", "True").lower() == "true"
-            use_date_filter = config.get("USE_DATE_FILTER", "True").lower() == "true"
+            extensions = config.get("EXTENSIONS", [])
+            min_size = config.get("MIN_SIZE")
+            max_size = config.get("MAX_SIZE")
+            move = config.get("MOVE", False)
+            zip_files = config.get("ZIP", False)
+            use_size_filter = config.get("USE_SIZE_FILTER", True)
+            use_date_filter = config.get("USE_DATE_FILTER", True)
             
-            start_date = datetime.strptime(config.get("START_DATE", ""), "%Y-%m-%d") if "START_DATE" in config and config["START_DATE"] else None
-            end_date = datetime.strptime(config.get("END_DATE", ""), "%Y-%m-%d") if "END_DATE" in config and config["END_DATE"] else None
+            start_date = datetime.strptime(config.get("START_DATE", ""), "%Y-%m-%d") if config.get("START_DATE") else None
+            end_date = datetime.strptime(config.get("END_DATE", ""), "%Y-%m-%d") if config.get("END_DATE") else None
+            
+            # Sabit tarih aralıkları
+            if "DATE_FILTER" in config:
+                start_date, end_date = get_relative_date_range(config["DATE_FILTER"])
             
             print(f"Processing: {config_file}")
             files = filter_files(source, extensions, min_size, max_size, use_size_filter, start_date, end_date, use_date_filter)
