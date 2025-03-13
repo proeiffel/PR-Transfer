@@ -11,7 +11,7 @@ EXTENSIONS: [".log", ".txt"]  # Sadece belirtilen uzantılara sahip dosyalar iş
 # Dosya boyutu filtreleme (bayt cinsinden)
 MIN_SIZE: 1024  # Minimum dosya boyutu (1KB)
 MAX_SIZE: 1048576  # Maksimum dosya boyutu (1MB)
-USE_SIZE_FILTER: True  # True: Boyut filtresini uygula, False: Tüm dosyaları al
+USE_SIZE_FILTER: False  # True: Boyut filtresini uygula, False: Tüm dosyaları al
 
 # Tarih filtreleme (YYYY-MM-DD formatında)
 START_DATE: "2024-03-01"  # Bu tarihten sonra oluşturulan dosyaları al
@@ -20,7 +20,7 @@ USE_DATE_FILTER: True  # True: Tarih filtresini uygula, False: Tüm dosyaları a
 
 # Sabit tarih aralıkları (START_DATE ve END_DATE yerine kullanılabilir)
 # Mevcut seçenekler: last_15_days, last_1_month, last_3_months, last_6_months, last_1_year
-DATE_FILTER: last_3_months  # Son 3 ay içinde değiştirilmiş dosyaları işle
+DATE_FILTER: last_15_days  # Son 3 ay içinde değiştirilmiş dosyaları işle
 
 # İşlem tipi: Dosyalar taşınacak mı yoksa kopyalanacak mı?
 MOVE: False  # True: Taşı (Kaynak klasörden sil), False: Kopyala
