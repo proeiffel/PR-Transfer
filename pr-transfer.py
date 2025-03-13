@@ -50,44 +50,49 @@ def filter_files(source, extensions=None, min_size=None, max_size=None, use_size
             files_to_process.append(file_path)
     return files_to_process
 
-def transfer_files(files, target, move=False, zip_files=False, log_file="file_transfer.log"):
+def zip_directory(target, zip_path):
+    """Hedef dizindeki tüm dosya ve klasörleri ZIP içerisine ekle, hiyerarşiyi koru"""
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk(target):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zipf.write(file_path, os.path.relpath(file_path, target))
+
+def transfer_files(files, source, target, move=False, zip_files=False, log_file="file_transfer.log"):
     """Dosyaları belirtilen hedefe taşı veya kopyala. Opsiyonel olarak zipleyebilir."""
     setup_logging(log_file)
     
     if not os.path.exists(target):
         os.makedirs(target)
     
+    for file_path in files:
+        relative_path = os.path.relpath(file_path, source)
+        target_path = os.path.join(target, relative_path)
+        target_dir = os.path.dirname(target_path)
+        
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        
+        try:
+            if move:
+                shutil.move(file_path, target_path)
+                action = "Moved"
+            else:
+                shutil.copy2(file_path, target_path)
+                action = "Copied"
+            
+            file_size = os.path.getsize(target_path)
+            logging.info(f"{action}: {file_path} -> {target_path} | Size: {file_size} bytes")
+            print(f"{action}: {file_path} -> {target_path}")
+        except Exception as e:
+            logging.error(f"Error processing {file_path}: {str(e)}")
+            print(f"Error: {file_path} -> {str(e)}")
+    
     if zip_files:
         zip_path = os.path.join(target, "transferred_files.zip")
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file_path in files:
-                file_name = os.path.basename(file_path)
-                try:
-                    zipf.write(file_path, file_name)
-                    logging.info(f"Zipped: {file_name} | Source: {file_path}")
-                    print(f"Zipped: {file_name}")
-                except Exception as e:
-                    logging.error(f"Error zipping {file_path}: {str(e)}")
-                    print(f"Error: {file_path} -> {str(e)}")
-    else:
-        for file_path in files:
-            file_name = os.path.basename(file_path)
-            target_path = os.path.join(target, file_name)
-            
-            try:
-                if move:
-                    shutil.move(file_path, target_path)
-                    action = "Moved"
-                else:
-                    shutil.copy2(file_path, target_path)
-                    action = "Copied"
-                
-                file_size = os.path.getsize(target_path)
-                logging.info(f"{action}: {file_name} | Size: {file_size} bytes | Target: {target_path}")
-                print(f"{action}: {file_name} -> {target_path}")
-            except Exception as e:
-                logging.error(f"Error processing {file_path}: {str(e)}")
-                print(f"Error: {file_path} -> {str(e)}")
+        zip_directory(target, zip_path)
+        logging.info(f"Zipped directory: {target} -> {zip_path}")
+        print(f"Zipped directory: {zip_path}")
 
 if __name__ == "__main__":
     configs = read_config_files()
@@ -119,4 +124,4 @@ if __name__ == "__main__":
             
             print(f"Processing: {config_file}")
             files = filter_files(source, extensions, min_size, max_size, use_size_filter, start_date, end_date, use_date_filter)
-            transfer_files(files, target, move, zip_files, log_file)
+            transfer_files(files, source, target, move, zip_files, log_file)
