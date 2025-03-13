@@ -23,7 +23,7 @@ USE_DATE_FILTER: True  # True: Tarih filtresini uygula, False: Tüm dosyaları a
 DATE_FILTER: last_15_days  # Son 3 ay içinde değiştirilmiş dosyaları işle
 
 # İşlem tipi: Dosyalar taşınacak mı yoksa kopyalanacak mı?
-MOVE: False  # True: Taşı (Kaynak klasörden sil), False: Kopyala
+MOVE: True  # True: Taşı (Kaynak klasörden sil), False: Kopyala
 
 # ZIP seçeneği
 ZIP: True  # True: Hedef klasörde ZIP oluştur, False: ZIP oluşturma
